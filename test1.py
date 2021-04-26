@@ -5,3 +5,4 @@ def thatsAreallyCoolFunction():
         print('time printed')
 
 thatsAreallyCoolFunction()
+print('as')
