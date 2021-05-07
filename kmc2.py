@@ -146,7 +146,7 @@ def getBorderValues(border, position, surface):
     if border == 'NOBORD':
         return []
 
-#performs specific event which is unbelivable
+#performs specific event
 def performEvent(eventNumber):
     #matrices which contain positions with no grain and grain on surface
     coordinatesZero = []
