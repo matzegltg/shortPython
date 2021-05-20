@@ -47,8 +47,10 @@ def rueckSub(R, rechteSeite):
                 sum = sum - (R[i][2-j]*x[j])
             xi = (rechteSeite[i]+sum)/R[i][i]
             x.append(xi)
+    
+    result = np.array(np.flip(x))[np.newaxis]
             
-    return np.flip(x)
+    return str(result.T)
 
 
 if __name__ == "__main__":
@@ -60,4 +62,4 @@ if __name__ == "__main__":
     print("Starte Iteration:")
     R, rechteSeite = QRZerlegung(A, b)
 
-    print(f"Das ist die Lösung von Rx = QTb: \n x = {str(rueckSub(R, rechteSeite))}")
+    print(f"Das ist die Lösung von Rx = QTb: \n x = {rueckSub(R, rechteSeite)}")
