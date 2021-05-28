@@ -15,22 +15,22 @@ print('-----------------------------------------------')
 def checkNumberOfSpecies(surface):
     return np.count_nonzero(surface)
 
-#chooses random coordinate from a given Matrix which contains coordinates of e.g. all Position of 0 = no grain or 1 = grain on surface
+#chooses random coordinate from a given Matrix which contains coordinates of e.g. 
+#all Position of 0 = no grain or 1 = grain on surface
 def choosePosition(coordinateMatrix):
     return coordinateMatrix[random.randint(0, len(coordinateMatrix)-1)]
 
-#chooses random direction by creating two random numbers between -1 and 1
+#chooses random direction
+#by creating two random numbers between -1 and 1
 def chooseRandomDiffusionDirection():
     return [random.randint(-1,1), random.randint(-1,1)]
 
 #performs deposition. basically just changing at specific position value from 0 to 1
 def performDeposition(position, surface):
-    print(f'deposition at: {position[0]} and {position[1]}')
     surface[position[0], position[1]] = 1
 
 #performs desorption. basically just changing at specifc position value from 1 to 0
 def performDesorption(position, surface):
-    print(f'desorption at: {position[0]} and {position[1]}')
     surface[position[0], position[1]] = 0
 
 #chooses random Position around selected, if position empty change values
@@ -38,17 +38,13 @@ def performDiffusionAtNoBorder(position, surface):
     check = False
     while check == False:
         direction = chooseRandomDiffusionDirection()
-        #question is diffusion on same point possible? --> Assumption neccessary otherwise problems with infinity while loop if environment
-        #of atom is occupied with other atoms 
+        #diffusion at same place also possible
         if direction == [0,0]:
             check = True
-            print(f'diffusion from at same place')
         if surface[position[0] + direction[0], position[1] + direction[1]] == 0:
-            #switch position -> diffusion
             surface[position[0], position[1]] = 0
             surface[position[0] + direction[0], position[1] + direction[1]] = 1
             check = True
-            print(f'difusion from ({position[0]}, {position[1]}) to ({position[0] + direction[0]},{position[1] + direction[1]}')
 
 #performs diffusion. executing diffusion event, taking care of periodic boundary
 def performBoundaryDiffusion(position, surface, borderValues):
@@ -64,19 +60,18 @@ def performBoundaryDiffusion(position, surface, borderValues):
         for i in range(0,len(borderValues)):
             #checks wheter direction is critical
             if direction == [borderValues[i,0], borderValues[i,1]]:
-                #checks if choosen target is empty
+                #checks wheater choosen target is empty
                 if surface[borderValues[i,2], borderValues[i,3]] == 0:
                     #perform diffusion
                     surface[position[0], position[1]] = 0
                     surface[borderValues[i,2],borderValues[i,3]] = 1
-                    print(f'Boundary diffusion from ({position[0]}, {position[1]}) to other side')
                     hasPerformedAction = True
                     break
 
                 else:
                     hasPerformedAction = False
         
-        #subsection checks wheter direction is not a 'critical' one
+        #subsection checks wheter direction is not 'critical'
         counter = 0
         for i in range(0,len(borderValues)):
             if direction == [borderValues[i,0], borderValues[i,1]]:
@@ -89,17 +84,18 @@ def performBoundaryDiffusion(position, surface, borderValues):
 #subfunction of performBoundaryDiffusion, if difussion direction's not out of surface
 def performBoundaryDiffusionIntoMap(position, surface, direction):
     if direction == [0,0]:
-        print('boundary diffusion from at same place')
+        #print('boundary diffusion from at same place')
         return True
         
     if surface[position[0] + direction[0], position[1] + direction[1]] == 0:
         surface[position[0], position[1]] = 0
         surface[position[0] + direction[0], position[1] + direction[1]] = 1
-        print(f'boundary diffusion from ({position[0]}, {position[1]}) to ({position[0] + direction[0]},{position[1] + direction[1]}')
+        #print(f'boundary diffusion from ({position[0]}, {position[1]}) to ({position[0] + direction[0]},{position[1] + direction[1]}')
         return True
 
 #returns a String of border situation around current position
 def getBorder(position, surface):
+    size = len(surface)
     if [position[0],position[1]] == [0,position[1]]:
         if [position[0],position[1]] == [0,size-1]:
             return 'NORTHEAST'
@@ -127,7 +123,8 @@ def getBorder(position, surface):
 def getBorderValues(border, position, surface):
     size = len(surface)
     if border == 'NORTHWEST':
-        return np.array([[+1,-1, position[0], size-1], [0, -1, position[0], size-1], [-1, -1, size-1, size-1], [-1,0, size-1, position[1]], [-1, +1, size-1, position[1] +1 ]])
+        return np.array([[+1,-1, position[0], size-1], [0, -1, position[0], size-1],
+        [-1, -1, size-1, size-1], [-1,0, size-1, position[1]], [-1, +1, size-1, position[1] +1 ]])
     if border == 'NORTHEAST':
         return np.array([[-1,-1, size-1, position[1]-1], [-1,0, size-1, position[1]], [-1,1,size-1,size-1], [0,1,position[0], 0], [1,1,position[0]+1,0]])
     if border == 'SOUTHEAST':
@@ -146,53 +143,42 @@ def getBorderValues(border, position, surface):
         return []
 
 #performs specific event
-def performEvent(eventNumber):
+def performEvent(eventNumber, surface, size):
+    
     #matrices which contain positions with no grain and grain on surface
-    coordinatesZero = []
-    coordinatesOne = []
-
-    #scans surface
-    for i in range(size):
-        for j in range(size):
-            if surface[i,j] == 0:
-                coordinatesZero.append([i,j])
-            else:
-                coordinatesOne.append([i,j])
+    coordinates = [[],[]]
+    coordinates[0] = np.argwhere(np.array(surface) == 0)
+    coordinates[1] = np.argwhere(np.array(surface) == 1)
 
     #Deposition
     if eventNumber == 1:
-        if len(coordinatesZero) > 0:
-            performDeposition(choosePosition(coordinatesZero), surface)
-        else:
-            print('no deposition possible')
+        if len(coordinates[0]) > 0:
+            coordinates = performDeposition(choosePosition(coordinates[0]), surface)
 
     #Diffusion
     if eventNumber == 2:
-        if len(coordinatesOne) > 0:
-            position = choosePosition(coordinatesOne)
+        if len(coordinates[1]) > 0:
+            position = choosePosition(coordinates[1])
             border = getBorder(position, surface)
 
             if border == 'NOBORD':
                 performDiffusionAtNoBorder(position, surface)
             else:
                 performBoundaryDiffusion(position, surface, getBorderValues(border, position, surface))
-        else:
-            print('no difffusion possible')
     
     #Desorption indepent of environmental atoms -> boundary unnecessary, otherwise individual desorptionRates
     if eventNumber == 3:
-        if len(coordinatesOne) > 0:
-            performDesorption(choosePosition(coordinatesOne), surface)
-        else:
-            print('no desorption possible')
+        if len(coordinates[1]) > 0:
+            performDesorption(choosePosition(coordinates[1]), surface)
+
+    return surface
     
-
-
 #event = 1: deposition, event = 2: diffusion, event = 3: desorption
 def chooseEvent(rDep, rHop, rDesorb, kTot):
     
-    #randint returns n; 1 <= n <= kTot
-    x = random.randint(1,kTot)
+    #random returns x: 0 <= x < 1
+    x = random.random()
+    x = x*kTot
     if x <= rDep:
         return 1
     if rDep < x <= rDep+rHop:
@@ -205,7 +191,7 @@ def chooseEvent(rDep, rHop, rDesorb, kTot):
 def timeStep(kTot):
     x = random.random()
     if x == 0:
-        print('try again')
+        timeStep(kTot)
     else:
         return - (math.log(x))/kTot
 
@@ -214,62 +200,67 @@ def calculateOccupancy(surface):
     size = len(surface)
     return checkNumberOfSpecies(surface)/(size*size)
 
-"""
-surface/lattice of grain, at start each position is empty
-atoms of grain do not vibrate etc.
-have fixed position but can diffuse
-"""
+def performKMC(size, timeStart, timeEnd, kDep, kHop, kDesorb):
+    #periodic border
+    #e.g. diffusion in upper right corner -> particle comes back
+    #in bottom left corner
+    surface = np.zeros((size, size))
 
-#input parameters
+    #store final data 0: time, 1: surfaces, 2: occupancy, 3: event Number, 4: rates, (table of events)
+    results = [[],[],[],[], []]
 
-#size of lattice
-size = 4
+    #just for readability
+    t = timeStart
+   
+    while t < timeEnd:
 
-#surface (lattice)
-#periodic border: infinite borders
-#e.g. diffusion in upper right corner -> comes back in downleft corner
-surface = np.zeros((size, size))
+        #calculate rates
+        rDep = (size*size)*kDep
+        rDiff = checkNumberOfSpecies(surface)*kHop
+        rDesorb = checkNumberOfSpecies(surface)*kDesorb
+        kTot = rDep + rDiff + rDesorb
 
-#store final data 0: time, 1: surfaces, 2: occupancy, 3: event Number
-results = [[],[],[],[]]
-results[0].append(0)
-results[1].append(surface.copy())
-results[2].append(0)
-results[3].append(0)
+        #choose event
+        eventNumber = chooseEvent(rDep, rDiff, rDesorb, kTot)
 
-# time
-t=0
+        #store data in results matrix 
+        results[0].append(t)
+        results[1].append(surface.copy())
+        results[2].append(calculateOccupancy(surface))
+        results[3].append(eventNumber)
+        results[4].append([rDep, rDiff, rDesorb])
 
-#unit?
-kDesorb = 1
-kHop = 1
-kDep = 1
-
-while t < 3:
+        #choose and perform event
+        t = t + timeStep(kTot)
+        surface = performEvent(eventNumber, surface, size)
     
-    #print(surface)
-    #calculate Rates
-    #Assumption: species on grain can either desorb or diffuse 
-    #question? rate of Deposition depends on number of empty position
-    rDep = ((size*size)-checkNumberOfSpecies(surface))*kDep
-    rDiff = checkNumberOfSpecies(surface)*kHop
-    rDesorb = checkNumberOfSpecies(surface)*kDesorb
-    kTot = rDep + rDiff + rDesorb
-    
-    #print(f'(rDep: {rDep}, rDiff: {rDiff}, rDesorb: {rDesorb}, kTot: {kTot}')
+    return results
 
-    #choose and perform Event
-    t = t + timeStep(kTot)
-    eventNumber = chooseEvent(rDep, rDiff, rDesorb,kTot)
-    performEvent(eventNumber)
+def doVisualizations(results, kDep, kHop, kDesorb):
+    vis.visualizeOccupancy(results, vis.calculateCumOccupancy(results))
+    x, y, z = vis.calculateProbabilitys(results)
+    vis.visualizeAnimation(results, kDep, kHop, kDesorb)
+    vis.plotInfo(x, y, z, results, kDep, kHop, kDesorb)
 
-    #store data in results matrix
-    results[0].append(t)
-    results[1].append(surface.copy())
-    results[2].append(calculateOccupancy(surface))
-    results[3].append(eventNumber)
+if __name__ == "__main__":
+    """
+    surface/lattice of grain, at start each position is empty
+    atoms of grain do not vibrate etc.
+    have fixed position but can diffuse
+    """
 
-print(results[1])
-vis.visualizeOccupancy(results)
-vis.visualizeAnimation(results)
-vis.plotInfo(results)
+    #input parameters
+    #size of lattice
+    size = 10
+
+    # time
+    timeStart=0
+    timeEnd=10
+
+    #rate constansts [1/s]
+    kDep = 1
+    kHop = 10
+    kDesorb = 4
+
+    results = performKMC(size, timeStart, timeEnd, kDep, kHop, kDesorb)
+    doVisualizations(results, kDep, kHop, kDesorb)
