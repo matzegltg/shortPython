@@ -177,8 +177,7 @@ def performEvent(eventNumber, surface, size):
 def chooseEvent(rDep, rHop, rDesorb, kTot):
     
     #random returns x: 0 <= x < 1
-    x = random.random()
-    x = x*kTot
+    x = random.random() * kTot
     if x <= rDep:
         return 1
     if rDep < x <= rDep+rHop:
@@ -236,8 +235,9 @@ def performKMC(size, timeStart, timeEnd, kDep, kHop, kDesorb):
     
     return results
 
-def doVisualizations(results, kDep, kHop, kDesorb):
-    vis.visualizeOccupancy(results, vis.calculateCumOccupancy(results))
+def doVisualizations(results, kDep, kHop, kDesorb, lastpoints=10):
+    #vis.visualizeOccupancy(results, vis.calculateMovingAverage(results, lastpoints), vis.calculateMovingAverage(results, lastpoints*100), vis.calculateMovingAverage(results, lastpoints*1000), lastpoints, kDep, kHop, kDesorb)
+    vis.visualizeOccupancy(results, kDep, kHop, kDesorb)
     x, y, z = vis.calculateProbabilitys(results)
     vis.visualizeAnimation(results, kDep, kHop, kDesorb)
     vis.plotInfo(x, y, z, results, kDep, kHop, kDesorb)
@@ -253,13 +253,13 @@ if __name__ == "__main__":
     #size of lattice
     size = 10
 
-    # time
+    # time [s]
     timeStart=0
-    timeEnd=10
+    timeEnd=100
 
     #rate constansts [1/s]
     kDep = 1
-    kHop = 10
+    kHop = 100
     kDesorb = 4
 
     results = performKMC(size, timeStart, timeEnd, kDep, kHop, kDesorb)
