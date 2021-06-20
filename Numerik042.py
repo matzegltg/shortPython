@@ -1,7 +1,7 @@
 import numpy
 from numpy import copy
 import matplotlib.pyplot as plt
-
+import scipy.integrate as integrate
 def solve(aa, bb, cc, dd):
     """ Thomas Algorithmus zum Loesen eines tridiagonalen Gleichungssystems
    
@@ -149,3 +149,6 @@ plt.axis( [0,16, -2, 2] )
 plt.legend()
 plt.title("Zeichnung von Spline")
 plt.show()
+
+
+result = integrate(lambda x: )

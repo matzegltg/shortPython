@@ -134,11 +134,3 @@ def LambdaAequidistant(n):
     plt.title("Lebesgue")
     plt.show()
 
-
-#LambdaTschebyscheff(8)
-#LambdaTschebyscheff(20)
-
-LambdaAequidistant(8)
-LambdaAequidistant(20)
-
-

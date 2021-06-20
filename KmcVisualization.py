@@ -76,7 +76,7 @@ def visualizeOccupancy(results, avgOccup1, avgOccup2, avgOccup3, lastpoints, kDe
     plt.grid(True)
     
     plt.show()
-'''
+
 def visualizeOccupancy(results, kDep, kHop, kDesorb):
     size = len(results[1][0])
     plt.title(f"kDeposition = {kDep} [1/s], \nkHopping = {kHop} [1/s], \nkDesorption = {kDesorb} [1/s]")
@@ -89,7 +89,7 @@ def visualizeOccupancy(results, kDep, kHop, kDesorb):
     plt.grid(True)
     
     plt.show()
-'''
+
 def plotInfo(probDep, probDiff, probDes, results, kDep, kHop, kDesorb):
     size = len(results[1][0])
     
