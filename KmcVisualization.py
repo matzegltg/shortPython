@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as anim
 from matplotlib.offsetbox import AnchoredText
 import time as tim
+import numpy as np
+import math as mth
 '''
 def calculateCumOccupancy(results):
     occupancySum = [0]
@@ -12,7 +14,7 @@ def calculateCumOccupancy(results):
 '''
 
 def calculateMovingAverage(results, lastpoints):
-    #moving average of last 9 elements
+    #moving average of last lastpoints elements
     occupancyMovingAverage = []
     for i in range(0,lastpoints-1):
         occupancyMovingAverage.append(0)
@@ -35,11 +37,12 @@ def calculateProbabilitys(results):
     probDes = []
 
     for i in range(0,len(results[0])):
-        kTot = results[4][i][0]+ results[4][i][1] + results[4][i][2]
+        kTot = results[4][i][3]
         probDep.append((results[4][i][0]/kTot))
         probDiff.append((results[4][i][1]/kTot))
         probDes.append((results[4][i][2]/kTot))
 
+    #print(probDes)
     return probDep, probDiff, probDes
 
 def visualizeAnimation(results, kDep, kHop, kDesorb):
@@ -61,13 +64,23 @@ def visualizeAnimation(results, kDep, kHop, kDesorb):
     plt.text(10, 5.5, description)
     plt.show()
     
-def visualizeOccupancy(results, avgOccup1, avgOccup2, avgOccup3, lastpoints, kDep, kHop, kDesorb):
-    size = len(results[1][0])
+def visualizeOccupancy(results, avgOccup1, lastpoints, kDep, kHop, kDesorb, timeStart, timeEnd, size):
+    avgOccup2 = calculateMovingAverage(results, lastpoints*10)
+    x = np.linspace(timeStart, timeEnd, 1000)
+    y = (((size*kDep)/kDesorb) * (1-1/(np.exp(kDesorb*x))))/size
+
+    constantlimit = []
+    for i in range(0,len(x)):
+        constantlimit.append(((size*kDep)/kDesorb)/size)
+    
+
+    plt.plot(results[0], results[2], '.-', linewidth=0.5, alpha = 0.02, color = "grey", label = "occupancy")
+    plt.plot(results[0], avgOccup1, '-', linewidth=0.8, label = 'moving average (last ' + str(lastpoints) + ' points)')
+    plt.plot(results[0], avgOccup2, 'r-', linewidth=1, label = 'moving average (last ' + str(lastpoints*10) + ' points)')
+    plt.plot(x, y, '-', linewidth = 1, color= "black", label = "analytical solution")
+    plt.plot(x, constantlimit, '--', linewidth = 1, label = f"analytical limit (= {((size*kDep)/kDesorb)/size})")
+
     plt.title(f"kDeposition = {kDep} [1/s], \nkHopping = {kHop} [1/s], \nkDesorption = {kDesorb} [1/s]")
-    plt.plot(results[0], results[2], '.-', linewidth=0.5, alpha = 0.1, color = "grey", label = "occupancy")
-    plt.plot(results[0], avgOccup1, '-', linewidth=0.5, label = 'moving average (last ' + str(lastpoints) + ' points)')
-    plt.plot(results[0], avgOccup2, '-', linewidth=1, label = 'moving average (last ' + str(lastpoints*100) + ' points)')
-    plt.plot(results[0], avgOccup3, '-', linewidth=1.5, color = "red", label = 'moving average (last ' + str(lastpoints*1000) + ' points)')
     plt.axis([0, results[0][len(results[0])-1], 0, 1])
     plt.xlabel('time t [s]')
     plt.legend(loc="lower right")
@@ -77,6 +90,7 @@ def visualizeOccupancy(results, avgOccup1, avgOccup2, avgOccup3, lastpoints, kDe
     
     plt.show()
 
+'''
 def visualizeOccupancy(results, kDep, kHop, kDesorb):
     size = len(results[1][0])
     plt.title(f"kDeposition = {kDep} [1/s], \nkHopping = {kHop} [1/s], \nkDesorption = {kDesorb} [1/s]")
@@ -89,6 +103,7 @@ def visualizeOccupancy(results, kDep, kHop, kDesorb):
     plt.grid(True)
     
     plt.show()
+'''
 
 def plotInfo(probDep, probDiff, probDes, results, kDep, kHop, kDesorb):
     size = len(results[1][0])

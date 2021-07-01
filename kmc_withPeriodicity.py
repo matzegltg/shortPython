@@ -227,7 +227,7 @@ def performKMC(size, timeStart, timeEnd, kDep, kHop, kDesorb):
         results[1].append(surface.copy())
         results[2].append(calculateOccupancy(surface))
         results[3].append(eventNumber)
-        results[4].append([rDep, rDiff, rDesorb])
+        results[4].append([rDep, rDiff, rDesorb, kTot])
 
         #choose and perform event
         t = t + timeStep(kTot)
@@ -235,11 +235,15 @@ def performKMC(size, timeStart, timeEnd, kDep, kHop, kDesorb):
     
     return results
 
-def doVisualizations(results, kDep, kHop, kDesorb, lastpoints=10):
-    #vis.visualizeOccupancy(results, vis.calculateMovingAverage(results, lastpoints), vis.calculateMovingAverage(results, lastpoints*100), vis.calculateMovingAverage(results, lastpoints*1000), lastpoints, kDep, kHop, kDesorb)
-    vis.visualizeOccupancy(results, kDep, kHop, kDesorb)
+def doVisualizations(results, kDep, kHop, kDesorb, lastpoints, timeStart, timeEnd, size):
+    if lastpoints > len(results[0]):
+        print("moving average too large!")
+    else:
+        pass    
+    #vis.visualizeOccupancy(results, vis.calculateMovingAverage(results, lastpoints), lastpoints, kDep, kHop, kDesorb, timeStart, timeEnd, size)
+    #vis.visualizeOccupancy(results, kDep, kHop, kDesorb)
     x, y, z = vis.calculateProbabilitys(results)
-    vis.visualizeAnimation(results, kDep, kHop, kDesorb)
+    #vis.visualizeAnimation(results, kDep, kHop, kDesorb)
     vis.plotInfo(x, y, z, results, kDep, kHop, kDesorb)
 
 if __name__ == "__main__":
@@ -259,8 +263,11 @@ if __name__ == "__main__":
 
     #rate constansts [1/s]
     kDep = 1
-    kHop = 10
-    kDesorb = 4
+    kHop = 3
+    kDesorb = 2
 
     results = performKMC(size, timeStart, timeEnd, kDep, kHop, kDesorb)
-    doVisualizations(results, kDep, kHop, kDesorb)
+
+    
+    lastpoints = 1000
+    doVisualizations(results, kDep, kHop, kDesorb, lastpoints, timeStart, timeEnd, size)
