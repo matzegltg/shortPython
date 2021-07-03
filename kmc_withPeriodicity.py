@@ -263,8 +263,8 @@ if __name__ == "__main__":
 
     #rate constansts [1/s]
     kDep = 1
-    kHop = 3
-    kDesorb = 2
+    kHop = 20
+    kDesorb = 4
 
     results = performKMC(size, timeStart, timeEnd, kDep, kHop, kDesorb)
 

@@ -2,15 +2,34 @@ import matplotlib.pyplot as plt
 import math
 import numpy as np
 
-x = np.linspace(-20, 20, 50)
+#parameter
+H0 = 3.5
+q = 10.72
+g = 9.81
+yalt = 2/3 * 3.5
+c1 = q**2/(2*g)
 
-y = (x**3) * 78.48-149.112*(x**2) + 48.67
+eps = 1
 
-print(np(y))
 
-fig, ax = plt.subplots()
-ax.plot(x,y)
+x = [0]
+y = [yalt]
+eps = [0.1]
+itcounter = 1
 
-ax.axis([-20,20,-20,20])
-plt.grid()
+while eps[itcounter-1] > 0.0001:
+    yneu = math.sqrt(c1/(H0-yalt))
+    eps.append((abs(yneu-yalt)/yneu))
+    x.append(itcounter)
+    y.append(yneu)
+    itcounter+=1
+    yalt = yneu
+
+#damit der plot schöner wird
+eps[0] = eps[1]
+plt.plot(x,y, label='Wassertiefe')
+plt.plot(x,eps, label='epsilon')
+plt.xlabel('Iterationen')
+plt.grid(True)
+plt.legend(loc='lower right')
 plt.show()
