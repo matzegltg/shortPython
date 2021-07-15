@@ -50,6 +50,7 @@ for k in range(1,20):
 
     trapezfehler = abs(ig - trapezsumme(x,N,h))
     simpsonfehler = abs(ig - simpson(x,N,h))
+
     if (simpsonfehler >= sys.float_info.epsilon):
         errorSimpson.append(simpsonfehler)
     else:
@@ -59,10 +60,13 @@ for k in range(1,20):
 
     kvalues.append(k)
 
+print(errorTrapez)
+print(errorSimpson)
 eps = []
 for i in range(len(kvalues)):
     eps.append(sys.float_info.epsilon)
 
+print(kvalues)
 plt.plot(kvalues, errorTrapez, "o-", label = "error Trapez")
 plt.plot(kvalues, errorSimpson, "o-", label="error Simpson")
 plt.plot(kvalues, eps, "--", color="grey", label = "epsilon")

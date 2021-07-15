@@ -42,6 +42,7 @@ def simpson(x, N, h) -> float:
 
 
 
+
 print(f'Trapezsumme: {trapezsumme(arrangeStuetz(a,N), N, h)}\n')
 print(f'Simpsonsumme: {simpson(arrangeStuetz(a,N), N, h)}\n')
 
